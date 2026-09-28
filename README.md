@@ -11,12 +11,13 @@ training borrows ideas from neuroplasticity:
 - replay helps retain previous experience
 - error-focused practice improves adaptation
 
-The project includes three local experiments:
+The project includes four experiments:
 
 1. Single-task action prediction with curriculum learning and replay.
 2. Continual learning across two robot-style tasks, where replay consolidation
    reduces forgetting after learning a new task.
 3. A replay-fraction sweep that measures the stability-plasticity tradeoff.
+4. A real public-dataset experiment using UCI Robot Execution Failures.
 
 ## Research Question
 
@@ -25,7 +26,7 @@ while learning a new task?
 
 ## Current Milestone
 
-The current version runs three small experiments:
+The current version runs four experiments:
 
 1. Train a baseline model on robot-style state/action trajectories.
 2. Train a neuroplasticity-inspired model with:
@@ -37,6 +38,7 @@ The current version runs three small experiments:
    - then learn Task B
    - compare forgetting with and without replay consolidation
 4. Compare validation loss, forgetting, and learning curves.
+5. Train and evaluate on the public UCI Robot Execution Failures dataset.
 
 This scaffold uses synthetic robot-style data first so the whole pipeline runs
 without a large dataset download. The next milestone is to replace the synthetic
@@ -73,6 +75,16 @@ Replay sweep:
 | 0.30 | 0.4525 | 0.1369 | 51.74% |
 | 0.45 | 0.3205 | 0.2169 | 65.82% |
 
+Public dataset result:
+
+| Metric | Sequential baseline | Replay consolidation |
+| --- | ---: | ---: |
+| Task A accuracy after Task B | 0.3704 | 0.7407 |
+| Task B final accuracy | 0.6000 | 0.6000 |
+| Forgetting | 0.4074 | 0.0370 |
+
+This public-dataset experiment uses the UCI Robot Execution Failures dataset.
+
 ## Recommended Publication Stack
 
 - Training: Kaggle Notebooks with GPU
@@ -88,8 +100,9 @@ https://www.kaggle.com/code/birwatkar/neurobot-plasticity
 
 ## Repository Status
 
-This is version `0.1.0`: a local, reproducible prototype using synthetic
-robot-style data. The next research version should add BridgeData V2 results.
+This is version `0.2.0`: a reproducible prototype with synthetic experiments
+plus a first real public robotics dataset experiment. The next research version
+should add BridgeData V2 or Open X-Embodiment results.
 
 ## Files
 
@@ -101,6 +114,7 @@ robot-style data. The next research version should add BridgeData V2 results.
 - `src/train.py` - baseline and neuroplasticity-inspired training experiment
 - `src/continual_learning.py` - replay consolidation experiment
 - `src/replay_sweep.py` - replay-fraction tradeoff sweep
+- `src/uci_robot_failures.py` - public UCI Robot Execution Failures experiment
 - `src/bridgedata_loader.py` - extracts a small TFDS/RLDS BridgeData subset
 - `src/train_bridge_subset.py` - trains on the extracted BridgeData subset
 - `requirements.txt` - Python dependencies
@@ -113,6 +127,7 @@ pip install -r requirements.txt
 python src/train.py
 python src/continual_learning.py
 python src/replay_sweep.py
+python src/uci_robot_failures.py
 ```
 
 The scripts write result files to `outputs/`.

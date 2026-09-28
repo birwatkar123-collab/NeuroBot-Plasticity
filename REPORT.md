@@ -11,6 +11,9 @@ to a new task. This demonstrates the stability-plasticity tradeoff, a useful
 research direction before moving to a public robotics dataset such as BridgeData
 V2.
 
+The project now also includes a first real public-dataset experiment using the
+UCI Robot Execution Failures dataset.
+
 ## Motivation
 
 Human and animal nervous systems do not learn a task once and remain fixed.
@@ -102,6 +105,18 @@ making new-task adaptation slower.
 As replay fraction increases, forgetting decreases steadily. However, Task B
 final error increases. This forms a clear stability-plasticity curve.
 
+### Public Dataset: UCI Robot Execution Failures
+
+| Metric | Sequential baseline | Replay consolidation |
+| --- | ---: | ---: |
+| Task A accuracy after Task B | 0.3704 | 0.7407 |
+| Task B final accuracy | 0.6000 | 0.6000 |
+| Forgetting | 0.4074 | 0.0370 |
+
+On this public robotics dataset, replay consolidation preserved much more Task
+A performance after learning Task B, while keeping Task B accuracy unchanged in
+this initial experiment.
+
 ## Interpretation
 
 The project supports a useful hypothesis: neuroplasticity-inspired replay is
@@ -118,7 +133,9 @@ old skills without slowing new learning too much.
 
 ## Limitations
 
-- The current results use synthetic robot-style data, not real robot rollouts.
+- The first experiments use synthetic robot-style data.
+- The first public-dataset result uses UCI Robot Execution Failures, which is a
+  small robot sensor dataset rather than a large manipulation dataset.
 - The action-prediction task is simpler than real manipulation.
 - The current model uses vector states, not raw images.
 - The replay strategy is basic random rehearsal.

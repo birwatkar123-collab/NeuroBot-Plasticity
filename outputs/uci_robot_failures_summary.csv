@@ -1,0 +1,9 @@
+metric,value
+baseline_task_a_before,0.777778
+baseline_task_a_after,0.370370
+baseline_task_b,0.600000
+replay_task_a_before,0.777778
+replay_task_a_after,0.740741
+replay_task_b,0.600000
+baseline_forgetting,0.407407
+replay_forgetting,0.037037

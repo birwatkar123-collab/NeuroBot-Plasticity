@@ -13,6 +13,7 @@ pip install -r requirements.txt
 python src/train.py
 python src/continual_learning.py
 python src/replay_sweep.py
+python src/uci_robot_failures.py
 ```
 
 ## Expected Outputs
@@ -25,6 +26,8 @@ The scripts write files to `outputs/`:
 - `results_summary.csv`
 - `continual_learning_summary.csv`
 - `replay_sweep.csv`
+- `uci_robot_failures_summary.csv`
+- `uci_robot_failures_public_dataset.png`
 
 ## Current Key Result
 
