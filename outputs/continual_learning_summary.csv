@@ -1,0 +1,3 @@
+metric,sequential_baseline,replay_consolidation,relative_change_percent
+task_a_forgetting_mean,0.937711,0.320506,65.81
+task_b_final_mse_mean,0.044324,0.216882,-389.31

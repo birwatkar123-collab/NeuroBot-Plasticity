@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: NeuroBot-Plasticity
+message: If you use this project, please cite it using this metadata.
+type: software
+authors:
+  - name: Gaurav Birwatkar
+abstract: Neuroplasticity-inspired robot task learning with replay consolidation, curriculum learning, and continual-learning evaluation.
+keywords:
+  - robot learning
+  - neuroplasticity
+  - continual learning
+  - replay consolidation
+  - stability-plasticity tradeoff
+license: MIT
+version: 0.1.0
+date-released: 2026-09-28

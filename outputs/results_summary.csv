@@ -1,0 +1,3 @@
+metric,baseline,plasticity_inspired,relative_improvement_percent
+final_validation_mse_mean,0.048074,0.051920,-8.10
+final_validation_mse_std,0.002264,0.001889,3.42
