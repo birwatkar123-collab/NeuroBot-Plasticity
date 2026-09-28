@@ -80,6 +80,12 @@ Replay sweep:
 - Demo: Hugging Face Spaces
 - Write-up: Medium, Hashnode, or arXiv later
 
+Public Kaggle notebook:
+
+```text
+https://www.kaggle.com/code/birwatkar/neurobot-plasticity
+```
+
 ## Repository Status
 
 This is version `0.1.0`: a local, reproducible prototype using synthetic
@@ -150,8 +156,13 @@ A zipped copy is available at:
 outputs/kaggle_upload_package.zip
 ```
 
-Before using Kaggle CLI, replace `YOUR_KAGGLE_USERNAME` in
-`kaggle_kernel/kernel-metadata.json` with your Kaggle username. Then run:
+The Kaggle metadata is configured for:
+
+```text
+birwatkar/neurobot-plasticity
+```
+
+To publish a new version with Kaggle CLI, run:
 
 ```bash
 kaggle kernels push -p kaggle_kernel
