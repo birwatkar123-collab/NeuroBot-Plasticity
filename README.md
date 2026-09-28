@@ -134,3 +134,25 @@ If Kaggle already has a TensorFlow Datasets cache attached, pass its directory:
 ```bash
 python src/bridgedata_loader.py --data-dir /kaggle/input/YOUR_TFDS_DIR --output data/bridge_subset.npz
 ```
+
+## Kaggle Upload Package
+
+The `kaggle_kernel/` folder contains a Kaggle-ready notebook package:
+
+- `kernel-metadata.json`
+- `neurobot_plasticity_kaggle.ipynb`
+- `requirements.txt`
+- `src/`
+
+A zipped copy is available at:
+
+```text
+outputs/kaggle_upload_package.zip
+```
+
+Before using Kaggle CLI, replace `YOUR_KAGGLE_USERNAME` in
+`kaggle_kernel/kernel-metadata.json` with your Kaggle username. Then run:
+
+```bash
+kaggle kernels push -p kaggle_kernel
+```

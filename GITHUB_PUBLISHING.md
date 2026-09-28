@@ -55,3 +55,34 @@ Release notes:
 ```text
 Initial local prototype with synthetic robot-style experiments, continual-learning evaluation, replay-fraction sweep, report, reproduction guide, and Kaggle starter notebook.
 ```
+
+## 6. Kaggle Notebook
+
+The repository includes a Kaggle-ready package in:
+
+```text
+kaggle_kernel/
+```
+
+Before pushing with Kaggle CLI, edit:
+
+```text
+kaggle_kernel/kernel-metadata.json
+```
+
+Replace:
+
+```text
+YOUR_KAGGLE_USERNAME
+```
+
+with your Kaggle username.
+
+Then run:
+
+```bash
+kaggle kernels push -p kaggle_kernel
+```
+
+If CLI upload fails because of local SSL/certificate settings, upload
+`outputs/kaggle_upload_package.zip` manually through Kaggle's notebook import UI.
