@@ -1,71 +1,100 @@
 # NeuroBot-Plasticity
 
-Neuroplasticity-inspired robot task learning with replay consolidation,
-curriculum learning, and continual-learning evaluation.
+**Neuroplasticity-inspired continual learning for robotics**
 
-This project studies whether robot training can improve when neural-network
-training borrows ideas from neuroplasticity:
+NeuroBot-Plasticity studies whether ideas inspired by biological neuroplasticity — especially repetition, memory consolidation, gradual adaptation, and replay — can help robot-learning systems learn new tasks while retaining previously acquired skills.
 
-- repetition strengthens useful behavior
-- gradual practice improves skill acquisition
-- replay helps retain previous experience
-- error-focused practice improves adaptation
-
-The project includes four experiments:
-
-1. Single-task action prediction with curriculum learning and replay.
-2. Continual learning across two robot-style tasks, where replay consolidation
-   reduces forgetting after learning a new task.
-3. A replay-fraction sweep that measures the stability-plasticity tradeoff.
-4. A real public-dataset experiment using UCI Robot Execution Failures.
+The central problem is **catastrophic forgetting**: after a model learns Task A, then Task B, then Task C, performance on earlier tasks can deteriorate. This project compares ordinary sequential learning with **replay consolidation**, where selected experiences from older tasks are mixed into later training.
 
 ## Research Question
 
-Can neuroplasticity-inspired replay help a robot policy remember older skills
-while learning a new task?
+> Can neuroplasticity-inspired replay reduce catastrophic forgetting in robot policies while preserving the ability to learn new tasks?
 
-## Current Milestone
+## Latest Milestone — Real Robot Data A → B → C
 
-The current version runs four experiments:
+The project has now completed successful **Task A → Task B → Task C continual-learning experiments on two public robotics sources**:
 
-1. Train a baseline model on robot-style state/action trajectories.
-2. Train a neuroplasticity-inspired model with:
-   - easy-to-hard curriculum stages
-   - replay buffer for previous examples
-   - extra sampling from high-error examples
-3. Train a continual-learning setup:
-   - learn Task A
-   - then learn Task B
-   - compare forgetting with and without replay consolidation
-4. Compare validation loss, forgetting, and learning curves.
-5. Train and evaluate on the public UCI Robot Execution Failures dataset.
+1. **BridgeData V2** — semantic continual learning within one manipulation dataset.
+2. **Open X-Embodiment** — cross-dataset/domain continual learning across RT-1, Kuka, and Jaco Play.
 
-This scaffold uses synthetic robot-style data first so the whole pipeline runs
-without a large dataset download. The next milestone is to replace the synthetic
-loader with a subset of BridgeData V2 or Open X-Embodiment.
-The repository now includes starter scripts for extracting and training on a
-small BridgeData subset through TensorFlow Datasets/RLDS.
+The successful Kaggle run used **2× Tesla T4 GPUs** and completed in about **3 minutes**.
 
-## Initial Results
+Kaggle run:
 
-Single-task training:
+```text
+https://www.kaggle.com/code/birwatkar/neurobot-plasticity-task-abc
+```
 
-- baseline mean final validation MSE: `0.0481`
-- plasticity-inspired mean final validation MSE: `0.0519`
+### BridgeData V2 Task Sequence
 
-Continual learning:
+The Bridge experiment grouped natural-language instructions into three sequential skill families:
 
-- sequential baseline forgetting: `0.9377`
-- replay consolidation forgetting: `0.3205`
-- sequential baseline Task B final MSE: `0.0443`
-- replay consolidation Task B final MSE: `0.2169`
-- best forgetting reduction in sweep: `65.82%` with replay fraction `0.45`
+- **Task A — object relocation:** put / place / move / transfer / bring / insert
+- **Task B — articulated-object manipulation:** open / close
+- **Task C — reorientation and complex manipulation:** flip / turn / rotate / fold / sweep / stack / push / pull / slide / pour
 
-Interpretation: replay consolidation strongly reduces forgetting of the old
-task, but it slows adaptation to the new task. This is the classic
-stability-plasticity tradeoff and gives the project a clear research direction.
+The loader scanned **396 episodes**, all with non-empty language instructions, and collected **800 samples per task**.
 
-Replay sweep:
+Example instructions included:
+
+- "put carrot on plate"
+- "open microwave"
+- "close fridge"
+- "flip cup upright"
+- "turn faucet front to left"
+- "slide the yellow cloth..."
+
+### BridgeData V2 Results
+
+| Metric | Sequential baseline | Replay consolidation |
+| --- | ---: | ---: |
+| Task A forgetting | 0.0945 | **-0.0028** |
+| Task B forgetting | 0.1403 | **0.0342** |
+| Mean forgetting | 0.1174 | **0.0157** |
+| Final mean MSE | 1.1695 | **1.1039** |
+
+**Relative mean-forgetting reduction with replay: 86.61%.**
+
+The slightly negative Task A forgetting value means Task A validation error improved slightly after later-task training rather than worsening.
+
+### Open X-Embodiment Task Sequence
+
+The OXE experiment used a cross-dataset/domain sequence:
+
+- **Task A:** `fractal20220817_data` (RT-1)
+- **Task B:** `kuka`
+- **Task C:** `jaco_play`
+
+Each task used **1,500 real trajectory samples** with a common lightweight representation and a standardized 7-D end-effector-compatible action target.
+
+### Open X-Embodiment Results
+
+| Metric | Sequential baseline | Replay consolidation |
+| --- | ---: | ---: |
+| Task A forgetting | **0.0277** | 0.0365 |
+| Task B forgetting | 0.1380 | **0.0324** |
+| Mean forgetting | 0.0828 | **0.0344** |
+| Final mean MSE | 0.9579 | **0.9203** |
+
+**Relative mean-forgetting reduction with replay: 58.43%.**
+
+Replay did not improve every individual task: OXE Task A forgetting increased slightly, while Task B retention improved substantially. Overall mean forgetting still decreased, illustrating the **stability-plasticity tradeoff** rather than a universally positive replay effect.
+
+## Previous Public-Dataset Result
+
+The earlier public-data proof of concept used **UCI Robot Execution Failures**.
+
+| Metric | Sequential baseline | Replay consolidation |
+| --- | ---: | ---: |
+| Task A accuracy after Task B | 0.3704 | 0.7407 |
+| Task B final accuracy | 0.6000 | 0.6000 |
+| Forgetting | 0.4074 | 0.0370 |
+
+This experiment first showed that replay could reduce forgetting on real robot execution data. The BridgeData V2 and Open X-Embodiment experiments extend the idea to richer robot trajectories and an A → B → C protocol.
+
+## Synthetic Continual-Learning Baseline
+
+The project also includes a controlled synthetic environment for method development and replay sweeps.
 
 | Replay fraction | Task A forgetting | Task B final MSE | Forgetting reduction |
 | --- | ---: | ---: | ---: |
@@ -75,50 +104,95 @@ Replay sweep:
 | 0.30 | 0.4525 | 0.1369 | 51.74% |
 | 0.45 | 0.3205 | 0.2169 | 65.82% |
 
-Public dataset result:
+This demonstrated the expected tradeoff: more replay preserved Task A better, but made adaptation to Task B slower.
 
-| Metric | Sequential baseline | Replay consolidation |
-| --- | ---: | ---: |
-| Task A accuracy after Task B | 0.3704 | 0.7407 |
-| Task B final accuracy | 0.6000 | 0.6000 |
-| Forgetting | 0.4074 | 0.0370 |
+## Neuroplasticity Mapping
 
-This public-dataset experiment uses the UCI Robot Execution Failures dataset.
+| Neuroscience idea | Machine-learning implementation |
+| --- | --- |
+| Repetition strengthens useful pathways | repeated training exposures |
+| Memory consolidation | replay buffer |
+| Gradual skill acquisition | curriculum / sequential learning |
+| Error correction | high-error example resampling |
+| Transfer between related skills | shared representation across tasks |
+| Stability-plasticity balance | retention vs new-task adaptation |
 
-## Recommended Publication Stack
+## Project Evolution
 
-- Training: Kaggle Notebooks with GPU
-- Code: GitHub
-- Demo: Hugging Face Spaces
-- Write-up: Medium, Hashnode, or arXiv later
+The project now includes:
 
-Public Kaggle notebook:
+1. Synthetic single-task action prediction.
+2. Curriculum learning and error-focused replay.
+3. Two-task continual learning.
+4. Replay-fraction stability-plasticity sweep.
+5. UCI Robot Execution Failures public-data experiment.
+6. **BridgeData V2 real-data Task A → B → C experiment.**
+7. **Open X-Embodiment cross-dataset Task A → B → C experiment.**
+
+## Current Repository Files
+
+- `src/train.py` — baseline and neuroplasticity-inspired synthetic training
+- `src/continual_learning.py` — replay consolidation experiment
+- `src/replay_sweep.py` — replay-fraction tradeoff sweep
+- `src/uci_robot_failures.py` — UCI Robot Execution Failures experiment
+- `src/bridgedata_loader.py` — original BridgeData subset loader
+- `src/train_bridge_subset.py` — original BridgeData subset training scaffold
+- `kaggle_task_abc/` — successful BridgeData/OXE Task A→B→C Kaggle package
+- `termux/` — Termux/Kaggle CLI control scripts
+- `REPORT.md` — project report
+- `REPRODUCE.md` — reproduction instructions
+- `PROJECT_PLAN.md` — project roadmap
+- `CITATION.cff` — citation metadata
+- `LICENSE` — MIT license
+
+## Kaggle
+
+Original project notebook:
 
 ```text
 https://www.kaggle.com/code/birwatkar/neurobot-plasticity
 ```
 
+Successful real-data A → B → C run:
+
+```text
+https://www.kaggle.com/code/birwatkar/neurobot-plasticity-task-abc
+```
+
+## Interpretation
+
+Across the current experiments, replay consistently reduces **average** catastrophic forgetting, but the benefit varies by task.
+
+The strongest current results are:
+
+- **BridgeData V2:** 86.61% reduction in mean forgetting
+- **Open X-Embodiment:** 58.43% reduction in mean forgetting
+- **UCI Robot Execution Failures:** forgetting reduced from 0.4074 to 0.0370
+
+These results support continued investigation of replay-based memory consolidation for continual robot learning.
+
+## Important Scope / Limitation
+
+This work is a **lightweight continual-learning policy-regression experiment**. It uses compact state, language, and/or low-resolution visual representations with standardized action targets.
+
+It is **not** full RT-X, Octo, OpenVLA, or large vision-language-action model pretraining, and the current results should not be interpreted as evidence that replay will automatically improve every robot policy or task.
+
+The next research stage should test:
+
+- multiple random seeds and confidence intervals
+- larger task samples
+- alternative replay fractions and prioritized replay
+- Elastic Weight Consolidation (EWC)
+- adapter-based continual learning
+- stronger visual encoders
+- larger policy architectures
+- real robot evaluation if hardware becomes available
+
 ## Repository Status
 
-This is version `0.2.0`: a reproducible prototype with synthetic experiments
-plus a first real public robotics dataset experiment. The next research version
-should add BridgeData V2 or Open X-Embodiment results.
+**Version 0.3.0 — successful real-data continual-learning milestone**
 
-## Files
-
-- `REPORT.md` - first project report with method, results, and interpretation
-- `REPRODUCE.md` - local reproduction instructions
-- `GITHUB_PUBLISHING.md` - checklist for publishing the repository
-- `CITATION.cff` - citation metadata
-- `LICENSE` - MIT license
-- `src/train.py` - baseline and neuroplasticity-inspired training experiment
-- `src/continual_learning.py` - replay consolidation experiment
-- `src/replay_sweep.py` - replay-fraction tradeoff sweep
-- `src/uci_robot_failures.py` - public UCI Robot Execution Failures experiment
-- `src/bridgedata_loader.py` - extracts a small TFDS/RLDS BridgeData subset
-- `src/train_bridge_subset.py` - trains on the extracted BridgeData subset
-- `requirements.txt` - Python dependencies
-- `PROJECT_PLAN.md` - roadmap for dataset integration and publishing
+NeuroBot-Plasticity has progressed from synthetic experiments and a small public-data proof of concept to successful A → B → C experiments on **BridgeData V2** and **Open X-Embodiment**.
 
 ## Quick Start
 
@@ -130,55 +204,10 @@ python src/replay_sweep.py
 python src/uci_robot_failures.py
 ```
 
-The scripts write result files to `outputs/`.
+## Author
 
-## Main Finding
+**Gaurav Birwatkar**
 
-The local results show a stability-plasticity tradeoff. More replay reduces
-forgetting of the old task, but slows adaptation to the new task. This is a
-strong first research story because it directly connects robot learning to a
-core neuroplasticity problem: preserving useful old patterns while remaining
-adaptable.
+## License
 
-## BridgeData V2 Subset Workflow
-
-The full BridgeData dataset is large, so start with a small subset on Kaggle or
-another machine with enough disk space.
-
-```bash
-python src/bridgedata_loader.py --output data/bridge_subset.npz --split "train[:1%]" --max-episodes 40
-python src/train_bridge_subset.py --data data/bridge_subset.npz
-```
-
-If Kaggle already has a TensorFlow Datasets cache attached, pass its directory:
-
-```bash
-python src/bridgedata_loader.py --data-dir /kaggle/input/YOUR_TFDS_DIR --output data/bridge_subset.npz
-```
-
-## Kaggle Upload Package
-
-The `kaggle_kernel/` folder contains a Kaggle-ready notebook package:
-
-- `kernel-metadata.json`
-- `neurobot_plasticity_kaggle.ipynb`
-- `requirements.txt`
-- `src/`
-
-A zipped copy is available at:
-
-```text
-outputs/kaggle_upload_package.zip
-```
-
-The Kaggle metadata is configured for:
-
-```text
-birwatkar/neurobot-plasticity
-```
-
-To publish a new version with Kaggle CLI, run:
-
-```bash
-kaggle kernels push -p kaggle_kernel
-```
+MIT
